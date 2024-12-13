@@ -100,16 +100,27 @@ class MahjongJudger:
         '''
         players_val = []
         win_player = -1
+        win_method = None
         for player in game.players:
             win, val = self.judge_hu(player)
             players_val.append(val)
             if win:
                 win_player = player.player_id
+
+                # 1211
+                if game.round.last_action_type == 'self_draw' and game.round.last_action_player == player.player_id:
+                    win_method = 'self_draw'
+                else:
+                    win_method = 'discard'
+                break
         if win_player != -1 or len(game.dealer.deck) == 0:
-            return True, win_player, players_val
+            return True, win_player, {
+                'method': win_method,
+                'from_player': game.round.last_action_player if win_method == 'discard' else None
+            }
         else:
             #player_id = players_val.index(max(players_val))
-            return False, win_player, players_val
+            return False, win_player, None
 
     def judge_hu(self, player):
         ''' Judge whether the player has win the game

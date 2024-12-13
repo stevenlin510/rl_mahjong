@@ -146,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--num_episodes',
         type=int,
-        default=5000,
+        default=1000,
     )
     parser.add_argument(
         '--num_eval_games',
@@ -161,7 +161,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--log_dir',
         type=str,
-        default='experiments/leduc_holdem_dqn_result/',
+        default='experiments/mahjong/',
     )
     
     parser.add_argument(
@@ -177,6 +177,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda
     train(args)
 

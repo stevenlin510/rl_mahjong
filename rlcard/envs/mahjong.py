@@ -19,6 +19,13 @@ class MahjongEnv(Env):
         self.state_shape = [[6, 34, 4] for _ in range(self.num_players)]
         self.action_shape = [None for _ in range(self.num_players)]
 
+        # 1211
+        self.reward_config = {
+            'base_win': 1.0,
+            'home_win': 2.0,
+            'self_draw': 1.5,
+        }       
+
     def _extract_state(self, state):
         ''' Encode state
 
@@ -40,13 +47,18 @@ class MahjongEnv(Env):
         piles_rep = np.array(piles_rep)
         table_rep = encode_cards(state['table'])
         rep = [hand_rep, table_rep]
-        rep.extend(piles_rep)
+        rep.extend(piles_rep)     
         obs = np.array(rep)
 
-        extracted_state = {'obs': obs, 'legal_actions': self._get_legal_actions()}
-        extracted_state['raw_obs'] = state
-        extracted_state['raw_legal_actions'] = [a for a in state['action_cards']]
-        extracted_state['action_record'] = self.action_recorder
+        extracted_state = {
+            'obs': obs,
+            'legal_actions': self._get_legal_actions(),
+            'raw_obs': state,
+            'raw_legal_actions': [a for a in state['action_cards']],
+            'action_record': self.action_recorder,
+            'last_action_type': state.get('last_action_type'),
+            'last_action_player': state.get('last_action_player')
+        }
 
         return extracted_state
 
@@ -56,12 +68,36 @@ class MahjongEnv(Env):
         Returns:
             payoffs (list): a list of payoffs for each player
         '''
-        _, player, _ = self.game.judger.judge_game(self.game)
-        if player == -1:
-            payoffs = [0, 0, 0, 0]
-        else:
-            payoffs = [-1, -1, -1, -1]
-            payoffs[player] = 1
+        if not self.game.is_over():
+            return np.array([0.0] * self.num_players)
+            
+        payoffs = [0.0] * self.num_players
+        winner = self.game.winner
+        
+        if winner == -1:  # Draw
+            return np.array([0.0] * self.num_players)
+
+
+        win_info = self.game.winning_type
+        if not win_info:
+            return np.array(payoffs)
+            
+        base_reward = self.reward_config['base_win']
+
+        if win_info['method'] == 'self_draw':
+            base_reward += self.reward_config['self_draw']
+
+        if winner == self.game.home_player:
+            base_reward += self.reward_config['home_win']
+            
+        payoffs[winner] = base_reward
+
+        # If won from discard, penalize the player who discarded
+        if win_info['method'] == 'discard':
+            discard_player = win_info['from_player']
+            if discard_player is not None:
+                payoffs[discard_player] -= 0.5
+                  
         return np.array(payoffs)
 
     def _decode_action(self, action_id):

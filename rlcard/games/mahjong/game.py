@@ -15,6 +15,13 @@ class MahjongGame:
         self.np_random = np.random.RandomState()
         self.num_players = 4
 
+        # 1211
+        self.home_player = None
+        self.winner = None
+        self.winning_type = None
+        
+
+
     def init_game(self):
         ''' Initialilze the game of Mahjong
 
@@ -35,9 +42,10 @@ class MahjongGame:
         self.judger = Judger(self.np_random)
         self.round = Round(self.judger, self.dealer, self.num_players, self.np_random)
 
-        # Deal 13 cards to each player to prepare for the game
+        # 1211
+        self.home_player = self.np_random.randint(0, self.num_players)
         for player in self.players:
-            self.dealer.deal_cards(player, 13)
+            self.dealer.deal_cards(player, 16)
 
         # Save the hisory for stepping back to the last state.
         self.history = []
@@ -91,6 +99,9 @@ class MahjongGame:
             (dict): The state of the player
         '''
         state = self.round.get_state(self.players, player_id)
+        
+        # 1211
+        state['home_player'] = self.home_player
         return state
 
     @staticmethod

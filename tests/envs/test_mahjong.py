@@ -3,7 +3,7 @@ import numpy as np
 
 import rlcard
 from rlcard.agents.random_agent import RandomAgent
-from .determism_util import is_deterministic
+from determism_util import is_deterministic
 
 class TestMahjongEnv(unittest.TestCase):
 
