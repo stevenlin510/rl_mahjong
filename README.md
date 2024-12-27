@@ -14,12 +14,12 @@ pip install -e .
 # Usage
 Train a single DQN Agent
 ```bash
-python run_dqn.py --log_dir 'experiments/mahjong_ppo_result/'
+python run_dqn.py --log_dir 'experiments/mahjong/'
 ```
 
 Train multiple DQN Agents
 ```bash
-python run_dqn_multi.py --log_dir 'experiments/mahjong_ppo_result/'
+python run_dqn_multi.py --log_dir 'experiments/mahjong_mg/'
 ```
 
 Play Demo with trained agent
