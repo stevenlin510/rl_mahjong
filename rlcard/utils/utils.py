@@ -249,3 +249,60 @@ def plot_curve(csv_path, save_path, algorithm):
 
         fig.savefig(save_path)
 
+def plot_curves(csv_path, save_path, algorithm):
+    ''' Read data from csv file and plot the results '''
+    import os
+    import csv
+    import matplotlib.pyplot as plt
+
+    rewards_dict = {}
+    
+    with open(csv_path) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            episode = int(row['episode'])
+            agent_id = int(row['agent_id'])
+            reward = float(row['reward'])
+
+            if agent_id not in rewards_dict:
+                rewards_dict[agent_id] = ([], [])  # Initialize list for episodes and rewards
+            
+            rewards_dict[agent_id][0].append(episode)
+            rewards_dict[agent_id][1].append(reward)
+
+    fig, ax = plt.subplots()
+    
+    # Plot each agent's performance
+    for agent_id, (episodes, rewards) in rewards_dict.items():
+        ax.plot(episodes, rewards, label=f'Agent {agent_id}')
+
+    ax.set(xlabel='Episode', ylabel='Reward')
+    ax.legend()
+    ax.grid()
+
+    save_dir = os.path.dirname(save_path)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    fig.savefig(save_path)
+
+
+def plot_loss(losses, save_path):
+    ''' Plot loss over episodes '''
+    import os
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    plt.figure()
+    steps = np.arange(1, len(losses) + 1)
+    plt.plot(steps, losses, label="Loss")
+    
+    plt.xlabel('Training Steps')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    save_dir = os.path.dirname(save_path)
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    plt.savefig(save_path)

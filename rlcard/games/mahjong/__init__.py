@@ -4,5 +4,4 @@ from rlcard.games.mahjong.player import MahjongPlayer as Player
 from rlcard.games.mahjong.judger import MahjongJudger as Judger
 from rlcard.games.mahjong.round import MahjongRound as Round
 from rlcard.games.mahjong.game import MahjongGame as Game
-from rlcard.games.mahjong.score import TaiwaneseScoring as Score
 

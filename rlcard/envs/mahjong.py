@@ -18,8 +18,6 @@ class MahjongEnv(Env):
         self.de_action_id = {self.action_id[key]: key for key in self.action_id.keys()}
         self.state_shape = [[6, 34, 4] for _ in range(self.num_players)]
         self.action_shape = [None for _ in range(self.num_players)]
-
-        # 1211
         self.reward_config = {
             'base_win': 1.0,
             'home_win': 2.0,
@@ -55,9 +53,7 @@ class MahjongEnv(Env):
             'legal_actions': self._get_legal_actions(),
             'raw_obs': state,
             'raw_legal_actions': [a for a in state['action_cards']],
-            'action_record': self.action_recorder,
-            'last_action_type': state.get('last_action_type'),
-            'last_action_player': state.get('last_action_player')
+            'action_record': self.action_recorder
         }
 
         return extracted_state
@@ -68,18 +64,12 @@ class MahjongEnv(Env):
         Returns:
             payoffs (list): a list of payoffs for each player
         '''
-        if not self.game.is_over():
-            return np.array([0.0] * self.num_players)
+
+        _, player, win_info = self.game.judger.judge_game(self.game)
             
         payoffs = [0.0] * self.num_players
-        winner = self.game.winner
         
-        if winner == -1:  # Draw
-            return np.array([0.0] * self.num_players)
-
-
-        win_info = self.game.winning_type
-        if not win_info:
+        if player == -1:  # Draw
             return np.array(payoffs)
             
         base_reward = self.reward_config['base_win']
@@ -87,17 +77,22 @@ class MahjongEnv(Env):
         if win_info['method'] == 'self_draw':
             base_reward += self.reward_config['self_draw']
 
-        if winner == self.game.home_player:
+        if player == self.game.home_player:
             base_reward += self.reward_config['home_win']
             
-        payoffs[winner] = base_reward
+        payoffs[player] = base_reward
 
         # If won from discard, penalize the player who discarded
         if win_info['method'] == 'discard':
             discard_player = win_info['from_player']
-            if discard_player is not None:
+            if discard_player != None:
                 payoffs[discard_player] -= 0.5
-                  
+                
+        else:
+            for i in range(self.num_players):
+                if i!=player:
+                    payoffs[i] -= 0.5
+
         return np.array(payoffs)
 
     def _decode_action(self, action_id):

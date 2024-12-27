@@ -108,15 +108,17 @@ class MahjongJudger:
                 win_player = player.player_id
 
                 # 1211
-                if game.round.last_action_type == 'self_draw' and game.round.last_action_player == player.player_id:
-                    win_method = 'self_draw'
+                if game.round.current_player == game.round.last_player:
+                    win_method = "self_draw"
+                elif game.round.last_player is None:
+                    win_method = "self_draw"
                 else:
                     win_method = 'discard'
                 break
         if win_player != -1 or len(game.dealer.deck) == 0:
             return True, win_player, {
                 'method': win_method,
-                'from_player': game.round.last_action_player if win_method == 'discard' else None
+                'from_player': game.round.last_player if win_method == 'discard' else None
             }
         else:
             #player_id = players_val.index(max(players_val))

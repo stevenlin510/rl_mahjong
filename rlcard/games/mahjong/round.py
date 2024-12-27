@@ -24,10 +24,6 @@ class MahjongRound:
         self.valid_act = False
         self.last_cards = []
 
-        # 1211
-        self.last_action_type = None
-        self.last_action_player = None
-
     def proceed_round(self, players, action):
         ''' Call other Classes's functions to keep one round running
 
@@ -45,36 +41,30 @@ class MahjongRound:
                 self.last_cards = cards
                 self.last_player = self.current_player
                 self.current_player = player.player_id
-                self.last_action_type = 'discard'
-                self.last_action_player = self.last_player
+
             else:
                 self.last_player = self.current_player
                 self.current_player = (self.player_before_act + 1) % 4
                 self.dealer.deal_cards(players[self.current_player], 1)
-                self.last_action_type = 'self_draw' 
-                self.last_action_player = self.current_player
                 self.valid_act = False
 
         elif action == 'gong':
             players[self.current_player].gong(self.dealer, self.last_cards)
             self.last_player = self.current_player
             self.valid_act = False
-            self.last_action_type = 'discard'
-            self.last_action_player = self.last_player
+
 
         elif action == 'pong':
             players[self.current_player].pong(self.dealer, self.last_cards)
             self.last_player = self.current_player
             self.valid_act = False
-            self.last_action_type = 'discard'
-            self.last_action_player = self.last_player
+
 
         elif action == 'chow':
             players[self.current_player].chow(self.dealer, self.last_cards)
             self.last_player = self.current_player
             self.valid_act = False
-            self.last_action_type = 'discard'
-            self.last_action_player = self.last_player
+
 
         else: # Play game: Proceed to next player
             players[self.current_player].play_card(self.dealer, action)
@@ -86,14 +76,13 @@ class MahjongRound:
                 self.last_cards = cards
                 self.last_player = self.current_player
                 self.current_player = player.player_id
-                self.last_action_type = 'discard'
-                self.last_action_player = self.last_player
+
             else:
                 self.last_player = self.current_player
                 self.current_player = (self.current_player + 1) % 4
                 self.dealer.deal_cards(players[self.current_player], 1)
-                self.last_action_type = 'self_draw'
-                self.last_action_player = self.current_player
+
+
         
         #hand_len = [len(p.hand) for p in players]
         #pile_len = [sum([len([c for c in p]) for p in pp.pile]) for pp in players]
@@ -117,8 +106,6 @@ class MahjongRound:
             state['current_hand'] = players[self.current_player].hand
             state['players_pile'] = {p.player_id: p.pile for p in players}
             state['action_cards'] = self.last_cards # For doing action (pong, chow, gong)
-            state['last_action_type'] = self.last_action_type
-            state['last_action_player'] = self.last_action_player
         else: # Regular Play
             state['valid_act'] = ['play']
             state['table'] = self.dealer.table
@@ -126,7 +113,5 @@ class MahjongRound:
             state['current_hand'] = players[player_id].hand
             state['players_pile'] = {p.player_id: p.pile for p in players}
             state['action_cards'] = players[player_id].hand # For doing action (pong, chow, gong)
-            state['last_action_type'] = self.last_action_type
-            state['last_action_player'] = self.last_action_player
         return state
 

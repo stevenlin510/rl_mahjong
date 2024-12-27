@@ -50,6 +50,6 @@ class TestMahjongEnv(unittest.TestCase):
         env.set_agents([RandomAgent(env.num_actions) for _ in range(env.num_players)])
         trajectories, payoffs = env.run(is_training=False)
         trajectories, payoffs = env.run(is_training=True)
-
+        # print(trajectories)
 if __name__ == '__main__':
     unittest.main()

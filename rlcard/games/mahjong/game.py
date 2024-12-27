@@ -15,10 +15,9 @@ class MahjongGame:
         self.np_random = np.random.RandomState()
         self.num_players = 4
 
-        # 1211
         self.home_player = None
         self.winner = None
-        self.winning_type = None
+        self.win_info = None
         
 
 
@@ -42,7 +41,6 @@ class MahjongGame:
         self.judger = Judger(self.np_random)
         self.round = Round(self.judger, self.dealer, self.num_players, self.np_random)
 
-        # 1211
         self.home_player = self.np_random.randint(0, self.num_players)
         for player in self.players:
             self.dealer.deal_cards(player, 16)
@@ -100,7 +98,6 @@ class MahjongGame:
         '''
         state = self.round.get_state(self.players, player_id)
         
-        # 1211
         state['home_player'] = self.home_player
         return state
 
@@ -148,11 +145,12 @@ class MahjongGame:
         Returns:
             (boolean): True if the game is over
         '''
-        win, player, _ = self.judger.judge_game(self)
+        win, player, win_info = self.judger.judge_game(self)
         #pile =[sorted([c.get_str() for c in s ]) for s in self.players[player].pile if self.players[player].pile != None]
         #cards = sorted([c.get_str() for c in self.players[player].hand])
         #count = len(cards) + sum([len(p) for p in pile])
         self.winner = player
+        self.win_info = win_info
         #print(win, player, players_val)
         #print(win, self.round.current_player, player, cards, pile, count)
         return win

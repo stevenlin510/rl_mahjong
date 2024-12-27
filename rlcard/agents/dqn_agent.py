@@ -124,6 +124,9 @@ class DQNAgent(object):
         self.save_path = save_path
         self.save_every = save_every
 
+        self.training_losses = []
+        print(f"Number of parameters: {sum(p.numel() for p in self.q_estimator.qnet.parameters())}")
+
     def feed(self, ts):
         ''' Store data in to replay buffer and train the agent. There are two stages.
             In stage 1, populate the memory without training
@@ -221,6 +224,9 @@ class DQNAgent(object):
         state_batch = np.array(state_batch)
 
         loss = self.q_estimator.update(state_batch, action_batch, target_batch)
+        
+        self.training_losses.append(float(loss))
+
         print('\rINFO - Step {}, rl-loss: {}'.format(self.total_t, loss), end='')
 
         # Update the target estimator
