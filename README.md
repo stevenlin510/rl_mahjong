@@ -12,9 +12,14 @@ Install this repo
 pip install -e . 
 ```
 # Usage
-Train DQN Agent
+Train a single DQN Agent
 ```bash
-python main.py --log_dir 'experiments/mahjong_ppo_result/'
+python run_dqn.py --log_dir 'experiments/mahjong_ppo_result/'
+```
+
+Train multiple DQN Agents
+```bash
+python run_dqn_multi.py --log_dir 'experiments/mahjong_ppo_result/'
 ```
 
 Play Demo with trained agent
